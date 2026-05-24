@@ -54,44 +54,43 @@
 
     <main class="main-layout">
         <section id="blog-grid">
-            <div class="loader-wrapper" id="main-loader">Syncing data pipeline...</div>
+            <div class="loader-wrapper" id="main-loader">Establishing secure connection stream...</div>
         </section>
 
         <aside class="sidebar">
             <div class="widget">
                 <h3 class="widget-title">Engine Information</h3>
-                <p style="font-size:0.9rem; color:var(--text-muted)">Status: <strong id="engine-status" style="color:orange">Connecting...</strong></p>
+                <p style="font-size:0.9rem; color:var(--text-muted)">Status: <strong id="engine-status" style="color:orange">Syncing...</strong></p>
             </div>
         </aside>
     </main>
 
     <script>
-        // Clean URL direct assembly
-        const SHEET_ID = '2PACX-1vQ8vM2tyrO9J127hMR6lvVePOsl5xs6Fm8db5HmKbEYNn19ZKtpFy_ofsOVukHaPuZQdXYha4F29BsQ';
-        const CSV_URL = `https://google.com{SHEET_ID}/pub?output=csv`;
+        // Clean direct parsing from your explicit link
+        const ORIGINAL_LINK = "https://google.com";
+        
+        // Open Proxy Wrapper to bypass browser CORS blockades instantly
+        const PROXY_URL = `https://allorigins.win{encodeURIComponent(ORIGINAL_LINK)}&timestamp=${new Date().getTime()}`;
 
         let allCachedPosts = [];
 
         async function fetchBlogs() {
             try {
-                const response = await fetch(`${CSV_URL}&cachebust=${new Date().getTime()}`);
+                const response = await fetch(PROXY_URL);
+                if (!response.ok) throw new Error("Proxy network gateway rejected stream layout.");
                 
-                if (!response.ok) {
-                    throw new Error("Google Sheets refused to return data. Check link sharing settings.");
-                }
-                
-                const text = await response.text();
-                
-                // If Google returns an HTML login/error page instead of raw CSV text
-                if (text.includes("<!DOCTYPE html") || text.includes("<html")) {
-                    throw new Error("Format mismatch. Make sure you selected 'Comma-Separated Values (.csv)' when publishing.");
+                const json = await response.json();
+                const text = json.contents;
+
+                if (!text || text.includes("<!DOCTYPE html")) {
+                    throw new Error("Empty spreadsheet or incorrect text layout received.");
                 }
 
-                // Simple fallback row parsing split
+                // Split csv cleanly by lines
                 let lines = text.split(/\r?\n/);
                 let rows = lines.map(line => line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
                 
-                rows.shift(); // Remove row 1 header
+                rows.shift(); // Clear title headers row
                 
                 allCachedPosts = rows.filter(r => r && r.length >= 3 && r[0] !== "");
 
@@ -101,15 +100,15 @@
                 filterPosts();
             } catch (error) {
                 console.error(error);
-                document.getElementById("engine-status").innerText = "Offline Error";
+                document.getElementById("engine-status").innerText = "Connection Refused";
                 document.getElementById("engine-status").style.color = "red";
                 
                 document.getElementById("blog-grid").innerHTML = `
                     <div class="error-box">
-                        <h3>⚠️ Pipeline Interrupted</h3>
-                        <p style="margin-top:8px;"><strong>Reason:</strong> ${error.message}</p>
+                        <h3>⚠️ Network Connection Failure</h3>
+                        <p style="margin-top:8px;"><strong>Details:</strong> Browser network policies are restricting the sheet layout.</p>
                         <p style="margin-top:12px; font-size:0.9rem; color:#4c0519;">
-                            To fix this: Go back to your Google Sheet > Click File > Share > Publish to web. Make sure the dropdown is set to <strong>Comma-separated values (.csv)</strong> and click Publish again.
+                            Please check your Google Sheet share rules: ensure it is marked public to anyone with the link.
                         </p>
                     </div>
                 `;
@@ -127,16 +126,15 @@
             }
 
             if (matches.length === 0) {
-                container.innerHTML = '<div class="loader-wrapper">Your database is connected, but no blog posts were found in the rows yet!</div>';
+                container.innerHTML = '<div class="loader-wrapper">Connected! Add your first text entry row inside your Google Sheet to watch it display here live.</div>';
                 return;
             }
 
-            // Loop backward to show latest rows first
             for (let i = matches.length - 1; i >= 0; i--) {
                 const row = matches[i];
                 const title = row[0] || "Untitled Post";
-                const author = row[1] || "Anonymous";
-                const timestamp = row[2] || "Just now";
+                const author = row[1] || "Anonymous Author";
+                const timestamp = row[2] || "Live Feed";
                 const content = row[3] || "";
                 
                 const initials = author.substring(0,2).toUpperCase();
@@ -157,7 +155,7 @@
         }
 
         fetchBlogs();
-        setInterval(fetchBlogs, 5000); // Check updates smoothly every 5 seconds
+        setInterval(fetchBlogs, 6000); // Poll for new data rows every 6 seconds smoothly
     </script>
 </body>
 </html>
