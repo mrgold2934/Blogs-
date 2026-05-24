@@ -3,176 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Disruptor Blog - Real-Time Feed</title>
+    <title>Disruptor Media — Global Intelligence Network</title>
     <style>
         :root {
-            --bg-color: #0d1117;
-            --card-bg: #161b22;
-            --text-main: #c9d1d9;
-            --accent: #58a6ff;
-            --border: #30363d;
+            --bg: #ffffff;
+            --surface: #ffffff;
+            --surface-hover: #fafafa;
+            --border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent: #2563eb;
+            --accent-glow: rgba(37, 99, 235, 0.05);
+            --live: #10b981;
+            --like: #ef4444;
+            --repost: #10b981;
         }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-        }
-        header {
-            text-align: center;
-            padding: 40px 0;
-            border-bottom: 1px solid var(--border);
-        }
-        h1 {
-            color: #fff;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        .live-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #39d353;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        .dot {
-            width: 8px;
-            height: 8px;
-            background-color: #39d353;
-            border-radius: 50%;
-            animation: pulse 1s infinite alternate;
-        }
-        @keyframes pulse {
-            from { opacity: 0.4; }
-            to { opacity: 1; }
-        }
-        #blog-container {
-            max-width: 800px;
-            margin: 40px auto;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-        .blog-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .blog-title {
-            color: #fff;
-            margin-top: 0;
-            font-size: 1.8rem;
-        }
-        .blog-meta {
-            font-size: 0.85rem;
-            color: #8b949e;
-            margin-bottom: 15px;
-        }
-        .blog-image {
-            width: 100%;
-            max-height: 400px;
-            object-fit: cover;
-            border-radius: 6px;
-            margin-bottom: 15px;
-        }
-        .blog-content {
-            line-height: 1.6;
-            font-size: 1.1rem;
-        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg); color: var(--text-main); line-height: 1.5; padding-bottom: 60px; }
+        
+        header { position: sticky; top: 0; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); z-index: 100; padding: 18px 24px; }
+        .nav-container { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+        .logo { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; color: #000; }
+        
+        .live-status { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-glow); padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 600; color: var(--accent); border: 1px solid var(--border); }
+        .pulse-dot { width: 6px; height: 6px; background-color: var(--live); border-radius: 50%; box-shadow: 0 0 8px var(--live); animation: pulse 1.2s infinite alternate; }
+        @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
+
+        .hero-section { max-width: 1100px; margin: 40px auto 20px; padding: 0 24px; }
+        .search-bar { width: 100%; max-width: 400px; background: #f8fafc; border: 1px solid var(--border); padding: 12px 16px; border-radius: 8px; color: var(--text-main); font-size: 0.95rem; outline: none; }
+        .search-bar:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px var(--accent-glow); }
+
+        .main-layout { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: 1fr; gap: 40px; }
+        @media (min-width: 768px) { .main-layout { grid-template-columns: 2.2fr 1fr; } }
+
+        #blog-grid { display: flex; flex-direction: column; gap: 40px; }
+        .premium-card { background: var(--surface); padding-bottom: 40px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 16px; }
+        
+        .img-wrapper { width: 100%; position: relative; padding-top: 50%; background: #f1f5f9; overflow: hidden; border-radius: 4px; }
+        .card-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        
+        .category-tag { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--accent); letter-spacing: 0.5px; }
+        .post-title { font-size: 1.75rem; font-weight: 700; color: var(--text-main); line-height: 1.25; }
+        .post-excerpt { color: var(--text-muted); font-size: 1.05rem; line-height: 1.6; }
+        
+        .author-profile { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 32px; height: 32px; border-radius: 50%; background: #f1f5f9; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; }
+        .meta-text { display: flex; flex-direction: column; font-size: 0.85rem; }
+        .author-name { font-weight: 600; }
+        .date-read { color: var(--text-muted); }
+
+        /* Modern Engagement Bar */
+        .engagement-bar { display: flex; align-items: center; gap: 24px; padding: 12px 0; border-top: 1px dashed var(--border); border-bottom: 1px dashed var(--border); margin-top: 8px; }
+        .engage-btn { background: none; border: none; display: flex; align-items: center; gap: 6px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: color 0.15s; }
+        .engage-btn:hover { color: var(--text-main); }
+        .engage-btn.liked { color: var(--like); }
+        .engage-btn.disliked { color: var(--text-main); }
+        .engage-btn.reposted { color: var(--repost); }
+
+        /* Comments Engine UI */
+        .comments-section { background: #f8fafc; padding: 20px; border-radius: 8px; margin-top: 12px; display: none; flex-direction: column; gap: 16px; }
+        .comments-section.active { display: flex; }
+        .comment-input-group { display: flex; gap: 10px; }
+        .comment-input { flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; outline: none; }
+        .comment-btn { background: var(--text-main); color: #fff; border: none; padding: 0 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .comments-list { display: flex; flex-direction: column; gap: 12px; max-height: 250px; overflow-y: auto; }
+        .comment-item { background: #fff; padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem; }
+        .comment-meta { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
+
+        /* Sidebar Widgets */
+        .sidebar { display: flex; flex-direction: column; gap: 24px; }
+        .widget { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 24px; }
+        .widget-title { font-size: 0.95rem; font-weight: 700; text-transform: uppercase; margin-bottom: 16px; }
+        .metrics-list { display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem; }
+        .metric-item { display: flex; justify-content: space-between; color: var(--text-muted); border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
+        .metric-val { font-weight: 600; color: var(--text-main); }
+        .loader-wrapper { text-align: center; padding: 40px; color: var(--text-muted); }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Disruptor Daily</h1>
-        <div class="live-indicator">
-            <span class="dot"></span> LIVE REFRESH ACTIVE (1s)
+        <div class="nav-container">
+            <div class="logo">DISRUPTOR DAILY</div>
+            <div class="live-status"><span class="pulse-dot"></span> LIVE PIPELINE</div>
         </div>
     </header>
 
-    <main id="blog-container">
-        <div style="text-align:center;">Connecting to backend pipeline...</div>
+    <div class="hero-section">
+        <input type="text" class="search-bar" id="blog-search" placeholder="Search publications..." oninput="filterPosts()">
+    </div>
+
+    <main class="main-layout">
+        <section id="blog-grid">
+            <div class="loader-wrapper">Syncing matrix modules...</div>
+        </section>
+
+        <aside class="sidebar">
+            <div class="widget">
+                <h3 class="widget-title">Engine Information</h3>
+                <div class="metrics-list">
+                    <div class="metric-item"><span>Synchronizer Rate:</span> <span class="metric-val">1s refresh</span></div>
+                    <div class="metric-item"><span>Active Writers:</span> <span class="metric-val" id="writers-count">0</span></div>
+                    <div class="metric-item"><span>Total Articles:</span> <span class="metric-val" id="rows-count">0</span></div>
+                </div>
+            </div>
+        </aside>
     </main>
 
     <script>
-        // PASTE YOUR COPIED GOOGLE SHEET CSV URL HERE
-        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8vM2tyrO9J127hMR6lvVePOsl5xs6Fm8db5HmKbEYNn19ZKtpFy_ofsOVukHaPuZQdXYha4F29BsQ/pub?output=csv&gid=0&single=true';
+        // YOUR UPDATED GOOGLE SHEET INFRASTRUCTURE
+        const BASE_ID = '2PACX-1vQ8vM2tyrO9J127hMR6lvVePOsl5xs6Fm8db5HmKbEYNn19ZKtpFy_ofsOVukHaPuZQdXYha4F29BsQ'; 
+        const CSV_URL = `https://google.com{BASE_ID}/pub?output=csv&gid=0&single=t`;
+        let allCachedPosts = [];
 
-        // Helper function to parse CSV text into arrays safely
+        function getMetrics(id, key, initialValue = 0) {
+            const data = localStorage.getItem(`blog_${key}_${id}`);
+            return data ? parseInt(data) : initialValue;
+        }
+
+        function stepMetrics(id, key, buttonEl, activeClass) {
+            let current = getMetrics(id, key);
+            if (buttonEl.classList.contains(activeClass)) {
+                current--;
+                buttonEl.classList.remove(activeClass);
+            } else {
+                current++;
+                buttonEl.classList.add(activeClass);
+            }
+            localStorage.setItem(`blog_${key}_${id}`, current);
+            buttonEl.querySelector('.count').innerText = current;
+        }
+
+        function toggleComments(id) {
+            const panel = document.getElementById(`comments-${id}`);
+            panel.classList.toggle('active');
+        }
+
+        function submitComment(id) {
+            const input = document.getElementById(`input-${id}`);
+            if (!input.value.trim()) return;
+
+            let comments = JSON.parse(localStorage.getItem(`blog_comments_list_${id}`)) || [];
+            comments.push({ text: input.value.trim(), date: new Date().toLocaleTimeString() });
+            localStorage.setItem(`blog_comments_list_${id}`, JSON.stringify(comments));
+            
+            input.value = '';
+            renderComments(id);
+        }
+
+        function renderComments(id) {
+            const listContainer = document.getElementById(`list-${id}`);
+            const countLabel = document.getElementById(`ccount-${id}`);
+            let comments = JSON.parse(localStorage.getItem(`blog_comments_list_${id}`)) || [];
+            
+            countLabel.innerText = comments.length;
+            listContainer.innerHTML = comments.map(c => `
+                <div class="comment-item">
+                    <div class="comment-meta">Anonymous Rider • ${c.date}</div>
+                    <div>${c.text}</div>
+                </div>
+            `).join('');
+        }
+
+        function calculateReadingTime(text) {
+            const words = text ? text.split(/\s+/).length : 0;
+            return `${Math.ceil(words / 200)} min read`;
+        }
+
         function parseCSV(text) {
             let lines = text.split('\n');
             return lines.map(line => {
-                let result = [];
-                let current = '';
-                let inQuotes = false;
-                for (let i = 0; i < line.length; i++) {
-                    let char = line[i];
-                    if (char === '"') {
-                        inQuotes = !inQuotes;
-                    } else if (char === ',' && !inQuotes) {
-                        result.push(current.trim());
-                        current = '';
-                    } else {
-                        current += char;
-                    }
-                }
-                result.push(current.trim());
-                return result;
-            });
-        }
-
-        async function fetchBlogs() {
-            try {
-                // Cache busting parameter added to URL to force fresh data every second
-                const response = await fetch(`${CSV_URL}?t=${new Date().getTime()}`);
-                const data = await response.text();
-                const rows = parseCSV(data);
-                
-                // Remove header row
-                const headers = rows.shift();
-                
-                // Clear old blogs
-                const container = document.getElementById('blog-container');
-                container.innerHTML = '';
-
-                // Loop through rows in reverse order to show newest posts first
-                for (let i = rows.length - 1; i >= 0; i--) {
-                    const row = rows[i];
-                    if (row.length < 4 || !row[0]) continue; // Skip empty rows
-
-                    const [title, author, timestamp, content, imageUrl] = row;
-
-                    const card = document.createElement('article');
-                    card.className = 'blog-card';
-
-                    let imageHTML = '';
-                    if (imageUrl && imageUrl.startsWith('http')) {
-                        imageHTML = `<img src="${imageUrl}" class="blog-image" alt="${title}">`;
-                    }
-
-                    card.innerHTML = `
-                        <h2 class="blog-title">${title}</h2>
-                        <div class="blog-meta">By <strong>${author}</strong> • ${timestamp}</div>
-                        ${imageHTML}
-                        <div class="blog-content">${content}</div>
-                    `;
-                    container.appendChild(card);
-                }
-            } catch (error) {
-                console.error('Error fetching blog data:', error);
-            }
-        }
-
-        // Run fetch immediately on load
-        fetchBlogs();
         
-        // Fetch fresh data every 1000ms (1 second)
-        setInterval(fetchBlogs, 1000);
-    </script>
-</body>
-</html>
-
