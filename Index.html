@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disruptor Blog - Real-Time Feed</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #c9d1d9;
+            --accent: #58a6ff;
+            --border: #30363d;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        h1 {
+            color: #fff;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #39d353;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            background-color: #39d353;
+            border-radius: 50%;
+            animation: pulse 1s infinite alternate;
+        }
+        @keyframes pulse {
+            from { opacity: 0.4; }
+            to { opacity: 1; }
+        }
+        #blog-container {
+            max-width: 800px;
+            margin: 40px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .blog-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .blog-title {
+            color: #fff;
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+        .blog-meta {
+            font-size: 0.85rem;
+            color: #8b949e;
+            margin-bottom: 15px;
+        }
+        .blog-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .blog-content {
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Disruptor Daily</h1>
+        <div class="live-indicator">
+            <span class="dot"></span> LIVE REFRESH ACTIVE (1s)
+        </div>
+    </header>
+
+    <main id="blog-container">
+        <div style="text-align:center;">Connecting to backend pipeline...</div>
+    </main>
+
+    <script>
+        // PASTE YOUR COPIED GOOGLE SHEET CSV URL HERE
+        const CSV_URL = 'YOUR_GOOGLE_SHEET_CSV_URL_HERE';
+
+        // Helper function to parse CSV text into arrays safely
+        function parseCSV(text) {
+            let lines = text.split('\n');
+            return lines.map(line => {
+                let result = [];
+                let current = '';
+                let inQuotes = false;
+                for (let i = 0; i < line.length; i++) {
+                    let char = line[i];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                result.push(current.trim());
+                return result;
+            });
+        }
+
+        async function fetchBlogs() {
+            try {
+                // Cache busting parameter added to URL to force fresh data every second
+                const response = await fetch(`${CSV_URL}?t=${new Date().getTime()}`);
+                const data = await response.text();
+                const rows = parseCSV(data);
+                
+                // Remove header row
+                const headers = rows.shift();
+                
+                // Clear old blogs
+                const container = document.getElementById('blog-container');
+                container.innerHTML = '';
+
+                // Loop through rows in reverse order to show newest posts first
+                for (let i = rows.length - 1; i >= 0; i--) {
+                    const row = rows[i];
+                    if (row.length < 4 || !row[0]) continue; // Skip empty rows
+
+                    const [title, author, timestamp, content, imageUrl] = row;
+
+                    const card = document.createElement('article');
+                    card.className = 'blog-card';
+
+                    let imageHTML = '';
+                    if (imageUrl && imageUrl.startsWith('http')) {
+                        imageHTML = `<img src="${imageUrl}" class="blog-image" alt="${title}">`;
+                    }
+
+                    card.innerHTML = `
+                        <h2 class="blog-title">${title}</h2>
+                        <div class="blog-meta">By <strong>${author}</strong> • ${timestamp}</div>
+                        ${imageHTML}
+                        <div class="blog-content">${content}</div>
+                    `;
+                    container.appendChild(card);
+                }
+            } catch (error) {
+                console.error('Error fetching blog data:', error);
+            }
+        }
+
+        // Run fetch immediately on load
+        fetchBlogs();
+        
+        // Fetch fresh data every 1000ms (1 second)
+        setInterval(fetchBlogs, 1000);
+    </script>
+</body>
+</html>
+
