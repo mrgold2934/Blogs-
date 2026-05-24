@@ -8,77 +8,35 @@
         :root {
             --bg: #ffffff;
             --surface: #ffffff;
-            --surface-hover: #fafafa;
             --border: #e2e8f0;
             --text-main: #0f172a;
             --text-muted: #64748b;
             --accent: #2563eb;
-            --accent-glow: rgba(37, 99, 235, 0.05);
             --live: #10b981;
-            --like: #ef4444;
-            --repost: #10b981;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg); color: var(--text-main); line-height: 1.5; padding-bottom: 60px; }
-        
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg); color: var(--text-main); padding-bottom: 60px; }
         header { position: sticky; top: 0; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); z-index: 100; padding: 18px 24px; }
         .nav-container { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
-        .logo { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; color: #000; }
-        
-        .live-status { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-glow); padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 600; color: var(--accent); border: 1px solid var(--border); }
-        .pulse-dot { width: 6px; height: 6px; background-color: var(--live); border-radius: 50%; box-shadow: 0 0 8px var(--live); animation: pulse 1.2s infinite alternate; }
+        .logo { font-size: 1.3rem; font-weight: 800; text-transform: uppercase; color: #000; }
+        .live-status { display: inline-flex; align-items: center; gap: 6px; background: rgba(37, 99, 235, 0.05); padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 600; color: var(--accent); border: 1px solid var(--border); }
+        .pulse-dot { width: 6px; height: 6px; background-color: var(--live); border-radius: 50%; animation: pulse 1.2s infinite alternate; }
         @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
-
         .hero-section { max-width: 1100px; margin: 40px auto 20px; padding: 0 24px; }
-        .search-bar { width: 100%; max-width: 400px; background: #f8fafc; border: 1px solid var(--border); padding: 12px 16px; border-radius: 8px; color: var(--text-main); font-size: 0.95rem; outline: none; }
-        .search-bar:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px var(--accent-glow); }
-
+        .search-bar { width: 100%; max-width: 400px; background: #f8fafc; border: 1px solid var(--border); padding: 12px 16px; border-radius: 8px; outline: none; }
         .main-layout { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: 1fr; gap: 40px; }
         @media (min-width: 768px) { .main-layout { grid-template-columns: 2.2fr 1fr; } }
-
         #blog-grid { display: flex; flex-direction: column; gap: 40px; }
         .premium-card { background: var(--surface); padding-bottom: 40px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 16px; }
-        
-        .img-wrapper { width: 100%; position: relative; padding-top: 50%; background: #f1f5f9; overflow: hidden; border-radius: 4px; }
-        .card-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-        
-        .category-tag { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--accent); letter-spacing: 0.5px; }
-        .post-title { font-size: 1.75rem; font-weight: 700; color: var(--text-main); line-height: 1.25; }
-        .post-excerpt { color: var(--text-muted); font-size: 1.05rem; line-height: 1.6; }
-        
-        .author-profile { display: flex; align-items: center; gap: 12px; }
-        .avatar { width: 32px; height: 32px; border-radius: 50%; background: #f1f5f9; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; }
-        .meta-text { display: flex; flex-direction: column; font-size: 0.85rem; }
-        .author-name { font-weight: 600; }
-        .date-read { color: var(--text-muted); }
-
-        /* Modern Engagement Bar */
-        .engagement-bar { display: flex; align-items: center; gap: 24px; padding: 12px 0; border-top: 1px dashed var(--border); border-bottom: 1px dashed var(--border); margin-top: 8px; }
-        .engage-btn { background: none; border: none; display: flex; align-items: center; gap: 6px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: color 0.15s; }
-        .engage-btn:hover { color: var(--text-main); }
-        .engage-btn.liked { color: var(--like); }
-        .engage-btn.disliked { color: var(--text-main); }
-        .engage-btn.reposted { color: var(--repost); }
-
-        /* Comments Engine UI */
-        .comments-section { background: #f8fafc; padding: 20px; border-radius: 8px; margin-top: 12px; display: none; flex-direction: column; gap: 16px; }
-        .comments-section.active { display: flex; }
-        .comment-input-group { display: flex; gap: 10px; }
-        .comment-input { flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; outline: none; }
-        .comment-btn { background: var(--text-main); color: #fff; border: none; padding: 0 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
-        .comments-list { display: flex; flex-direction: column; gap: 12px; max-height: 250px; overflow-y: auto; }
-        .comment-item { background: #fff; padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem; }
-        .comment-meta { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
-
-        /* Sidebar Widgets */
+        .post-title { font-size: 1.75rem; font-weight: 700; }
+        .post-excerpt { color: var(--text-muted); font-size: 1.05rem; }
+        .author-profile { display: flex; align-items: center; gap: 12px; font-size: 0.85rem; }
+        .avatar { width: 32px; height: 32px; border-radius: 50%; background: #f1f5f9; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: bold; }
         .sidebar { display: flex; flex-direction: column; gap: 24px; }
         .widget { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 24px; }
         .widget-title { font-size: 0.95rem; font-weight: 700; text-transform: uppercase; margin-bottom: 16px; }
-        .metrics-list { display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem; }
-        .metric-item { display: flex; justify-content: space-between; color: var(--text-muted); border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
-        .metric-val { font-weight: 600; color: var(--text-main); }
-        .loader-wrapper { text-align: center; padding: 40px; color: var(--text-muted); }
+        .loader-wrapper { text-align: center; padding: 40px; color: var(--text-muted); font-weight: 500; }
+        .error-box { background: #fff1f2; border: 1px solid #fecdd3; color: #9f1239; padding: 20px; border-radius: 8px; line-height: 1.6; }
     </style>
 </head>
 <body>
@@ -96,147 +54,110 @@
 
     <main class="main-layout">
         <section id="blog-grid">
-            <div class="loader-wrapper">Syncing matrix modules...</div>
+            <div class="loader-wrapper" id="main-loader">Syncing data pipeline...</div>
         </section>
 
         <aside class="sidebar">
             <div class="widget">
                 <h3 class="widget-title">Engine Information</h3>
-                <div class="metrics-list">
-                    <div class="metric-item"><span>Synchronizer Rate:</span> <span class="metric-val">1s refresh</span></div>
-                    <div class="metric-item"><span>Active Writers:</span> <span class="metric-val" id="writers-count">0</span></div>
-                    <div class="metric-item"><span>Total Articles:</span> <span class="metric-val" id="rows-count">0</span></div>
-                </div>
+                <p style="font-size:0.9rem; color:var(--text-muted)">Status: <strong id="engine-status" style="color:orange">Connecting...</strong></p>
             </div>
         </aside>
     </main>
 
     <script>
-        // FIXED DATAPATH PIPELINE CONTEXT
-        const BASE_ID = '2PACX-1vQ8vM2tyrO9J127hMR6lvVePOsl5xs6Fm8db5HmKbEYNn19ZKtpFy_ofsOVukHaPuZQdXYha4F29BsQ'; 
-        const CSV_URL = `https://google.com{BASE_ID}/pub?output=csv&gid=0&single=t`;
+        // Clean URL direct assembly
+        const SHEET_ID = '2PACX-1vQ8vM2tyrO9J127hMR6lvVePOsl5xs6Fm8db5HmKbEYNn19ZKtpFy_ofsOVukHaPuZQdXYha4F29BsQ';
+        const CSV_URL = `https://google.com{SHEET_ID}/pub?output=csv`;
+
         let allCachedPosts = [];
 
-        function getMetrics(id, key, initialValue = 0) {
-            const data = localStorage.getItem(`blog_${key}_${id}`);
-            return data ? parseInt(data) : initialValue;
-        }
+        async function fetchBlogs() {
+            try {
+                const response = await fetch(`${CSV_URL}&cachebust=${new Date().getTime()}`);
+                
+                if (!response.ok) {
+                    throw new Error("Google Sheets refused to return data. Check link sharing settings.");
+                }
+                
+                const text = await response.text();
+                
+                // If Google returns an HTML login/error page instead of raw CSV text
+                if (text.includes("<!DOCTYPE html") || text.includes("<html")) {
+                    throw new Error("Format mismatch. Make sure you selected 'Comma-Separated Values (.csv)' when publishing.");
+                }
 
-        function stepMetrics(id, key, buttonEl, activeClass) {
-            let current = getMetrics(id, key);
-            if (buttonEl.classList.contains(activeClass)) {
-                current--;
-                buttonEl.classList.remove(activeClass);
-            } else {
-                current++;
-                buttonEl.classList.add(activeClass);
+                // Simple fallback row parsing split
+                let lines = text.split(/\r?\n/);
+                let rows = lines.map(line => line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
+                
+                rows.shift(); // Remove row 1 header
+                
+                allCachedPosts = rows.filter(r => r && r.length >= 3 && r[0] !== "");
+
+                document.getElementById("engine-status").innerText = "Connected!";
+                document.getElementById("engine-status").style.color = "green";
+                
+                filterPosts();
+            } catch (error) {
+                console.error(error);
+                document.getElementById("engine-status").innerText = "Offline Error";
+                document.getElementById("engine-status").style.color = "red";
+                
+                document.getElementById("blog-grid").innerHTML = `
+                    <div class="error-box">
+                        <h3>⚠️ Pipeline Interrupted</h3>
+                        <p style="margin-top:8px;"><strong>Reason:</strong> ${error.message}</p>
+                        <p style="margin-top:12px; font-size:0.9rem; color:#4c0519;">
+                            To fix this: Go back to your Google Sheet > Click File > Share > Publish to web. Make sure the dropdown is set to <strong>Comma-separated values (.csv)</strong> and click Publish again.
+                        </p>
+                    </div>
+                `;
             }
-            localStorage.setItem(`blog_${key}_${id}`, current);
-            buttonEl.querySelector('.count').innerText = current;
         }
 
-        function toggleComments(id) {
-            const panel = document.getElementById(`comments-${id}`);
-            panel.classList.toggle('active');
-        }
+        function filterPosts() {
+            const query = document.getElementById('blog-search').value.toLowerCase();
+            const container = document.getElementById('blog-grid');
+            container.innerHTML = '';
 
-        function submitComment(id) {
-            const input = document.getElementById(`input-${id}`);
-            if (!input.value.trim()) return;
-
-            let comments = JSON.parse(localStorage.getItem(`blog_comments_list_${id}`)) || [];
-            comments.push({ text: input.value.trim(), date: new Date().toLocaleTimeString() });
-            localStorage.setItem(`blog_comments_list_${id}`, JSON.stringify(comments));
-            
-            input.value = '';
-            renderComments(id);
-        }
-
-        function renderComments(id) {
-            const listContainer = document.getElementById(`list-${id}`);
-            const countLabel = document.getElementById(`ccount-${id}`);
-            let comments = JSON.parse(localStorage.getItem(`blog_comments_list_${id}`)) || [];
-            
-            countLabel.innerText = comments.length;
-            listContainer.innerHTML = comments.map(c => `
-                <div class="comment-item">
-                    <div class="comment-meta">Anonymous Rider • ${c.date}</div>
-                    <div>${c.text}</div>
-                </div>
-            `).join('');
-        }
-
-        function calculateReadingTime(text) {
-            const words = text ? text.split(/\s+/).length : 0;
-            return `${Math.ceil(words / 200)} min read`;
-        }
-
-        function parseCSV(text) {
-            let lines = text.split('\n');
-            return lines.map(line => {
-    </main>
-
-    <script>
-        // YOUR UPDATED GOOGLE SHEET INFRASTRUCTURE
-        const BASE_ID = '2PACX-1vQ8vM2tyrO9J127hMR6lvVePOsl5xs6Fm8db5HmKbEYNn19ZKtpFy_ofsOVukHaPuZQdXYha4F29BsQ'; 
-        const CSV_URL = `https://google.com{BASE_ID}/pub?output=csv&gid=0&single=t`;
-        let allCachedPosts = [];
-
-        function getMetrics(id, key, initialValue = 0) {
-            const data = localStorage.getItem(`blog_${key}_${id}`);
-            return data ? parseInt(data) : initialValue;
-        }
-
-        function stepMetrics(id, key, buttonEl, activeClass) {
-            let current = getMetrics(id, key);
-            if (buttonEl.classList.contains(activeClass)) {
-                current--;
-                buttonEl.classList.remove(activeClass);
-            } else {
-                current++;
-                buttonEl.classList.add(activeClass);
+            let matches = allCachedPosts;
+            if (query) {
+                matches = allCachedPosts.filter(r => r.join(' ').toLowerCase().includes(query));
             }
-            localStorage.setItem(`blog_${key}_${id}`, current);
-            buttonEl.querySelector('.count').innerText = current;
+
+            if (matches.length === 0) {
+                container.innerHTML = '<div class="loader-wrapper">Your database is connected, but no blog posts were found in the rows yet!</div>';
+                return;
+            }
+
+            // Loop backward to show latest rows first
+            for (let i = matches.length - 1; i >= 0; i--) {
+                const row = matches[i];
+                const title = row[0] || "Untitled Post";
+                const author = row[1] || "Anonymous";
+                const timestamp = row[2] || "Just now";
+                const content = row[3] || "";
+                
+                const initials = author.substring(0,2).toUpperCase();
+
+                const article = document.createElement('article');
+                article.className = 'premium-card';
+                article.innerHTML = `
+                    <div style="font-size:0.75rem; font-weight:700; color:var(--accent);">INTELLIGENCE REPORT</div>
+                    <h2 class="post-title">${title}</h2>
+                    <p class="post-excerpt">${content}</p>
+                    <div class="author-profile">
+                        <div class="avatar">${initials}</div>
+                        <div><strong>${author}</strong> • ${timestamp}</div>
+                    </div>
+                `;
+                container.appendChild(article);
+            }
         }
 
-        function toggleComments(id) {
-            const panel = document.getElementById(`comments-${id}`);
-            panel.classList.toggle('active');
-        }
-
-        function submitComment(id) {
-            const input = document.getElementById(`input-${id}`);
-            if (!input.value.trim()) return;
-
-            let comments = JSON.parse(localStorage.getItem(`blog_comments_list_${id}`)) || [];
-            comments.push({ text: input.value.trim(), date: new Date().toLocaleTimeString() });
-            localStorage.setItem(`blog_comments_list_${id}`, JSON.stringify(comments));
-            
-            input.value = '';
-            renderComments(id);
-        }
-
-        function renderComments(id) {
-            const listContainer = document.getElementById(`list-${id}`);
-            const countLabel = document.getElementById(`ccount-${id}`);
-            let comments = JSON.parse(localStorage.getItem(`blog_comments_list_${id}`)) || [];
-            
-            countLabel.innerText = comments.length;
-            listContainer.innerHTML = comments.map(c => `
-                <div class="comment-item">
-                    <div class="comment-meta">Anonymous Rider • ${c.date}</div>
-                    <div>${c.text}</div>
-                </div>
-            `).join('');
-        }
-
-        function calculateReadingTime(text) {
-            const words = text ? text.split(/\s+/).length : 0;
-            return `${Math.ceil(words / 200)} min read`;
-        }
-
-        function parseCSV(text) {
-            let lines = text.split('\n');
-            return lines.map(line => {
-        
+        fetchBlogs();
+        setInterval(fetchBlogs, 5000); // Check updates smoothly every 5 seconds
+    </script>
+</body>
+</html>
