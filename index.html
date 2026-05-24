@@ -112,6 +112,71 @@
     </main>
 
     <script>
+        // FIXED DATAPATH PIPELINE CONTEXT
+        const BASE_ID = '2PACX-1vQ8vM2tyrO9J127hMR6lvVePOsl5xs6Fm8db5HmKbEYNn19ZKtpFy_ofsOVukHaPuZQdXYha4F29BsQ'; 
+        const CSV_URL = `https://google.com{BASE_ID}/pub?output=csv&gid=0&single=t`;
+        let allCachedPosts = [];
+
+        function getMetrics(id, key, initialValue = 0) {
+            const data = localStorage.getItem(`blog_${key}_${id}`);
+            return data ? parseInt(data) : initialValue;
+        }
+
+        function stepMetrics(id, key, buttonEl, activeClass) {
+            let current = getMetrics(id, key);
+            if (buttonEl.classList.contains(activeClass)) {
+                current--;
+                buttonEl.classList.remove(activeClass);
+            } else {
+                current++;
+                buttonEl.classList.add(activeClass);
+            }
+            localStorage.setItem(`blog_${key}_${id}`, current);
+            buttonEl.querySelector('.count').innerText = current;
+        }
+
+        function toggleComments(id) {
+            const panel = document.getElementById(`comments-${id}`);
+            panel.classList.toggle('active');
+        }
+
+        function submitComment(id) {
+            const input = document.getElementById(`input-${id}`);
+            if (!input.value.trim()) return;
+
+            let comments = JSON.parse(localStorage.getItem(`blog_comments_list_${id}`)) || [];
+            comments.push({ text: input.value.trim(), date: new Date().toLocaleTimeString() });
+            localStorage.setItem(`blog_comments_list_${id}`, JSON.stringify(comments));
+            
+            input.value = '';
+            renderComments(id);
+        }
+
+        function renderComments(id) {
+            const listContainer = document.getElementById(`list-${id}`);
+            const countLabel = document.getElementById(`ccount-${id}`);
+            let comments = JSON.parse(localStorage.getItem(`blog_comments_list_${id}`)) || [];
+            
+            countLabel.innerText = comments.length;
+            listContainer.innerHTML = comments.map(c => `
+                <div class="comment-item">
+                    <div class="comment-meta">Anonymous Rider • ${c.date}</div>
+                    <div>${c.text}</div>
+                </div>
+            `).join('');
+        }
+
+        function calculateReadingTime(text) {
+            const words = text ? text.split(/\s+/).length : 0;
+            return `${Math.ceil(words / 200)} min read`;
+        }
+
+        function parseCSV(text) {
+            let lines = text.split('\n');
+            return lines.map(line => {
+    </main>
+
+    <script>
         // YOUR UPDATED GOOGLE SHEET INFRASTRUCTURE
         const BASE_ID = '2PACX-1vQ8vM2tyrO9J127hMR6lvVePOsl5xs6Fm8db5HmKbEYNn19ZKtpFy_ofsOVukHaPuZQdXYha4F29BsQ'; 
         const CSV_URL = `https://google.com{BASE_ID}/pub?output=csv&gid=0&single=t`;
