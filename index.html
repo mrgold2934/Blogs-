@@ -66,8 +66,8 @@
     </main>
 
     <script>
-        // FIXED: Pointed directly to Google's public visual visualization endpoint to pull data without CORS blocks
-        const SHEET_ID = "2PACX-1vQ8vM2tyrO9J127hMR6lvVePOsl5xs6Fm8db5HmKbEYNn19ZKtpFy_ofsOVukHaPuZQdXYha4F29BsQ";
+        // Directly using your sheet ID inside Google's Visualization API endpoint
+        const SHEET_ID = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8vM2tyrO9J127hMR6lvVePOsl5xs6Fm8db5HmKbEYNn19ZKtpFy_ofsOVukHaPuZQdXYha4F29BsQ/pubhtml?gid=0&single=true";
         const DATA_URL = "https://google.com" + SHEET_ID + "/gviz/tq?tqx=out:json";
 
         let allCachedPosts = [];
@@ -79,7 +79,6 @@
                 
                 const rawText = await response.text();
                 
-                // Google wraps the JSON inside an API signature callback string method. This removes the wrapping cleanly:
                 const jsonStart = rawText.indexOf("{");
                 const jsonEnd = rawText.lastIndexOf("}");
                 const cleanJsonText = rawText.substring(jsonStart, jsonEnd + 1);
@@ -87,12 +86,14 @@
                 const data = JSON.parse(cleanJsonText);
                 const tableRows = data.table.rows;
 
+                // FIXED: Checked array index structures correctly to safely fetch internal values
                 allCachedPosts = tableRows.map(row => {
+                    const cells = row.c || [];
                     return [
-                        row.c[0] ? row.c[0].v : "Untitled Post",                  // Column A: Title
-                        row.c[1] ? row.c[1].v : "Anonymous Author",               // Column B: Author
-                        row.c[2] ? row.c[2].v : "Live Feed",                      // Column C: Timestamp
-                        row.c[3] ? row.c[3].v : "No text description provided."   // Column D: Content
+                        cells[0] ? (cells[0].f || cells[0].v || "") : "Untitled Post",
+                        cells[1] ? (cells[1].f || cells[1].v || "") : "Anonymous Author",
+                        cells[2] ? (cells[2].f || cells[2].v || "") : "Live Feed",
+                        cells[3] ? (cells[3].f || cells[3].v || "") : "No text description provided."
                     ];
                 });
 
@@ -101,16 +102,16 @@
                 
                 filterPosts();
             } catch (error) {
-                console.error("Connection stream layout failure:", error);
+                console.error("Connection stream failure:", error);
                 document.getElementById("engine-status").innerText = "Connection Refused";
                 document.getElementById("engine-status").style.color = "red";
                 
                 document.getElementById("blog-grid").innerHTML = `
                     <div class="error-box">
                         <h3>⚠️ Network Connection Failure</h3>
-                        <p style="margin-top:8px;"><strong>Details:</strong> The browser data stream pipeline encountered a security restriction layout rule.</p>
+                        <p style="margin-top:8px;"><strong>Details:</strong> Stream layouts are blocked by security rules.</p>
                         <p style="margin-top:12px; font-size:0.9rem; color:#4c0519;">
-                            Please verify your spreadsheet layout sharing privileges. Open your document feed, click <strong>File -> Share -> Publish to Web</strong>, and make sure it has been activated.
+                            Please double-check your Google Sheet: Ensure it is published via <strong>File -> Share -> Publish to Web</strong>.
                         </p>
                     </div>
                 `;
@@ -134,12 +135,14 @@
 
             for (let i = matches.length - 1; i >= 0; i--) {
                 const row = matches[i];
+                
+                // FIXED: Re-added array bracket selectors to display the text data
                 const title = row[0];
                 const author = row[1];
                 const timestamp = row[2];
                 const content = row[3];
                 
-                const initials = author.substring(0, 2).toUpperCase();
+                const initials = String(author).substring(0, 2).toUpperCase();
 
                 const article = document.createElement('article');
                 article.className = 'premium-card';
@@ -157,7 +160,6 @@
             }
         }
 
-        // Initialize execution sequence stream
         fetchBlogs();
     </script>
 </body>
