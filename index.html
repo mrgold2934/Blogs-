@@ -66,84 +66,72 @@
     </main>
 
     <script>
-        // 1. FIXED: Correctly changed the URL to use output=csv to download raw data instead of HTML layout webpage
-        const ORIGINAL_LINK = "https://google.com";
+        // Updated with your explicit live sheet data export URL
+        const ORIGINAL_LINK = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8vM2tyrO9J127hMR6lvVePOsl5xs6Fm8db5HmKbEYNn19ZKtpFy_ofsOVukHaPuZQdXYha4F29BsQ/pub?gid=0&single=true&output=csv";
         
-        // 2. FIXED: Valid proxy configuration layout
-        const PROXY_URL = `https://allorigins.win\({encodeURIComponent(ORIGINAL_LINK)}&timestamp=\){new Date().getTime()}`;
+        const PROXY_URL = "https://allorigins.win" + encodeURIComponent(ORIGINAL_LINK) + "&timestamp=" + new Date().getTime();
 
         let allCachedPosts = [];
 
         async function fetchBlogs() {
             try {
                 const response = await fetch(PROXY_URL);
-                if (!response.ok) throw new Error("Proxy network gateway rejected stream layout.");
+                if (!response.ok) throw new Error("Proxy connection failed.");
                 
                 const json = await response.json();
                 const text = json.contents;
 
                 if (!text || text.includes("<!DOCTYPE html")) {
-                    throw new Error("Incorrect text format or blank sheet setup configuration received.");
+                    throw new Error("Invalid format layout stream.");
                 }
 
-                // Split CSV data cleanly by line breaks
-                let lines = text.split(/\r?\n/);
-                // Correctly filter out empty rows before mapping
-                let validLines = lines.filter(line => line.trim() !== "");
-                
-                let rows = validLines.map(line => line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
-                
-                rows.shift(); // Remove row headers (Title, Author, Timestamp, Content)
-                
-                // Ensure the row has enough valid row columns to run
-                allCachedPosts = rows.filter(r => r && r.length >= 1 && r[0] !== "");
-
-                document.getElementById("engine-status").innerText = "Connected!";
-                document.getElementById("engine-status").style.color = "green";
-                
-                filterPosts();
+                processData(text);
             } catch (error) {
-                console.error("Primary connection failure:", error);
-                // Fallback attempt using secondary gateway if AllOrigins encounters an issue
+                console.warn("Primary proxy connection failed, migrating to fallback...", error);
                 fetchFallback();
             }
         }
 
         async function fetchFallback() {
             try {
-                // Secondary backup proxy configuration structure
-                const FALLBACK_URL = `https://codetabs.com\${encodeURIComponent(ORIGINAL_LINK)}`;
+                const FALLBACK_URL = "https://codetabs.com" + encodeURIComponent(ORIGINAL_LINK);
                 const response = await fetch(FALLBACK_URL);
-                if (!response.ok) throw new Error("Backup gateway failed.");
+                if (!response.ok) throw new Error("Fallback failed.");
                 
                 const text = await response.text();
-                if (!text || text.includes("<!DOCTYPE html")) throw new Error("Invalid sheet structure.");
+                if (!text || text.includes("<!DOCTYPE html")) throw new Error("Invalid file content format.");
 
-                let lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
-                let rows = lines.map(line => line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
-                rows.shift();
-                
-                allCachedPosts = rows.filter(r => r && r.length >= 1 && r[0] !== "");
-
-                document.getElementById("engine-status").innerText = "Connected!";
-                document.getElementById("engine-status").style.color = "green";
-                
-                filterPosts();
+                processData(text);
             } catch (fallbackError) {
-                console.error("All proxies failed:", fallbackError);
+                console.error("All proxies connection stream refused:", fallbackError);
                 document.getElementById("engine-status").innerText = "Connection Refused";
                 document.getElementById("engine-status").style.color = "red";
                 
                 document.getElementById("blog-grid").innerHTML = `
                     <div class="error-box">
                         <h3>⚠️ Network Connection Failure</h3>
-                        <p style="margin-top:8px;"><strong>Details:</strong> Browser network security rules or proxy services are restricting data layout streams.</p>
+                        <p style="margin-top:8px;"><strong>Details:</strong> Direct stream layouts are blocked by cross-origin resource rules.</p>
                         <p style="margin-top:12px; font-size:0.9rem; color:#4c0519;">
-                            Please double check inside your Google Sheet: Click <strong>File -> Share -> Publish to Web</strong>, ensure it is set as <strong>Comma-separated values (.csv)</strong> and click Publish.
+                            Verify the Google Sheet setup configuration: click <strong>File -> Share -> Publish to Web</strong>, verify output option is configured as <strong>Comma-separated values (.csv)</strong> and republish.
                         </p>
                     </div>
                 `;
             }
+        }
+
+        function processData(text) {
+            let lines = text.split(/\r?\n/);
+            let validLines = lines.filter(line => line.trim() !== "");
+            
+            let rows = validLines.map(line => line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
+            rows.shift(); // Remove column headers
+            
+            allCachedPosts = rows.filter(r => r && r.length >= 1 && r !== "");
+
+            document.getElementById("engine-status").innerText = "Connected!";
+            document.getElementById("engine-status").style.color = "green";
+            
+            filterPosts();
         }
 
         function filterPosts() {
@@ -161,10 +149,8 @@
                 return;
             }
 
-            // Loop and present listings
             for (let i = matches.length - 1; i >= 0; i--) {
                 const row = matches[i];
-                // Clean CSV quotes if present
                 const cleanStr = (str) => (str || "").replace(/^"|"$/g, '').trim();
 
                 const title = cleanStr(row[0]) || "Untitled Post";
@@ -176,4 +162,22 @@
 
                 const article = document.createElement('article');
                 article.className = 'premium-card';
-                article.innerHTML = `
+                
+                article.innerHTML = 
+                    '<div style="font-size:0.75rem; font-weight:700; color:var(--accent);">INTELLIGENCE REPORT</div>' +
+                    '<h2 class="post-title">' + title + '</h2>' +
+                    '<p class="post-excerpt">' + content + '</p>' +
+                    '<div class="author-profile">' +
+                        '<div class="avatar">' + initials + '</div>' +
+                        '<div><strong>' + author + '</strong> • ' + timestamp + '</div>' +
+                    '</div>';
+                
+                container.appendChild(article);
+            }
+        }
+
+        // Initialize connection
+        fetchBlogs();
+    </script>
+</body>
+</html>
