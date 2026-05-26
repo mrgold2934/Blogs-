@@ -66,72 +66,55 @@
     </main>
 
     <script>
-        // Updated with your explicit live sheet data export URL
-        const ORIGINAL_LINK = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8vM2tyrO9J127hMR6lvVePOsl5xs6Fm8db5HmKbEYNn19ZKtpFy_ofsOVukHaPuZQdXYha4F29BsQ/pub?gid=0&single=true&output=csv";
-        
-        const PROXY_URL = "https://allorigins.win" + encodeURIComponent(ORIGINAL_LINK) + "&timestamp=" + new Date().getTime();
+        // FIXED: Pointed directly to Google's public visual visualization endpoint to pull data without CORS blocks
+        const SHEET_ID = "2PACX-1vQ8vM2tyrO9J127hMR6lvVePOsl5xs6Fm8db5HmKbEYNn19ZKtpFy_ofsOVukHaPuZQdXYha4F29BsQ";
+        const DATA_URL = "https://google.com" + SHEET_ID + "/gviz/tq?tqx=out:json";
 
         let allCachedPosts = [];
 
         async function fetchBlogs() {
             try {
-                const response = await fetch(PROXY_URL);
-                if (!response.ok) throw new Error("Proxy connection failed.");
+                const response = await fetch(DATA_URL);
+                if (!response.ok) throw new Error("Google database pipeline refused response context.");
                 
-                const json = await response.json();
-                const text = json.contents;
+                const rawText = await response.text();
+                
+                // Google wraps the JSON inside an API signature callback string method. This removes the wrapping cleanly:
+                const jsonStart = rawText.indexOf("{");
+                const jsonEnd = rawText.lastIndexOf("}");
+                const cleanJsonText = rawText.substring(jsonStart, jsonEnd + 1);
+                
+                const data = JSON.parse(cleanJsonText);
+                const tableRows = data.table.rows;
 
-                if (!text || text.includes("<!DOCTYPE html")) {
-                    throw new Error("Invalid format layout stream.");
-                }
+                allCachedPosts = tableRows.map(row => {
+                    return [
+                        row.c[0] ? row.c[0].v : "Untitled Post",                  // Column A: Title
+                        row.c[1] ? row.c[1].v : "Anonymous Author",               // Column B: Author
+                        row.c[2] ? row.c[2].v : "Live Feed",                      // Column C: Timestamp
+                        row.c[3] ? row.c[3].v : "No text description provided."   // Column D: Content
+                    ];
+                });
 
-                processData(text);
+                document.getElementById("engine-status").innerText = "Connected!";
+                document.getElementById("engine-status").style.color = "green";
+                
+                filterPosts();
             } catch (error) {
-                console.warn("Primary proxy connection failed, migrating to fallback...", error);
-                fetchFallback();
-            }
-        }
-
-        async function fetchFallback() {
-            try {
-                const FALLBACK_URL = "https://codetabs.com" + encodeURIComponent(ORIGINAL_LINK);
-                const response = await fetch(FALLBACK_URL);
-                if (!response.ok) throw new Error("Fallback failed.");
-                
-                const text = await response.text();
-                if (!text || text.includes("<!DOCTYPE html")) throw new Error("Invalid file content format.");
-
-                processData(text);
-            } catch (fallbackError) {
-                console.error("All proxies connection stream refused:", fallbackError);
+                console.error("Connection stream layout failure:", error);
                 document.getElementById("engine-status").innerText = "Connection Refused";
                 document.getElementById("engine-status").style.color = "red";
                 
                 document.getElementById("blog-grid").innerHTML = `
                     <div class="error-box">
                         <h3>⚠️ Network Connection Failure</h3>
-                        <p style="margin-top:8px;"><strong>Details:</strong> Direct stream layouts are blocked by cross-origin resource rules.</p>
+                        <p style="margin-top:8px;"><strong>Details:</strong> The browser data stream pipeline encountered a security restriction layout rule.</p>
                         <p style="margin-top:12px; font-size:0.9rem; color:#4c0519;">
-                            Verify the Google Sheet setup configuration: click <strong>File -> Share -> Publish to Web</strong>, verify output option is configured as <strong>Comma-separated values (.csv)</strong> and republish.
+                            Please verify your spreadsheet layout sharing privileges. Open your document feed, click <strong>File -> Share -> Publish to Web</strong>, and make sure it has been activated.
                         </p>
                     </div>
                 `;
             }
-        }
-
-        function processData(text) {
-            let lines = text.split(/\r?\n/);
-            let validLines = lines.filter(line => line.trim() !== "");
-            
-            let rows = validLines.map(line => line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
-            rows.shift(); // Remove column headers
-            
-            allCachedPosts = rows.filter(r => r && r.length >= 1 && r !== "");
-
-            document.getElementById("engine-status").innerText = "Connected!";
-            document.getElementById("engine-status").style.color = "green";
-            
-            filterPosts();
         }
 
         function filterPosts() {
@@ -151,14 +134,12 @@
 
             for (let i = matches.length - 1; i >= 0; i--) {
                 const row = matches[i];
-                const cleanStr = (str) => (str || "").replace(/^"|"$/g, '').trim();
-
-                const title = cleanStr(row[0]) || "Untitled Post";
-                const author = cleanStr(row[1]) || "Anonymous Author";
-                const timestamp = cleanStr(row[2]) || "Live Feed";
-                const content = cleanStr(row[3]) || "No text description provided.";
+                const title = row[0];
+                const author = row[1];
+                const timestamp = row[2];
+                const content = row[3];
                 
-                const initials = author.substring(0,2).toUpperCase();
+                const initials = author.substring(0, 2).toUpperCase();
 
                 const article = document.createElement('article');
                 article.className = 'premium-card';
@@ -176,7 +157,7 @@
             }
         }
 
-        // Initialize connection
+        // Initialize execution sequence stream
         fetchBlogs();
     </script>
 </body>
